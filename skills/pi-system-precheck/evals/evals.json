@@ -1,0 +1,68 @@
+{
+  "skill_name": "pi-system-precheck",
+  "version": "1.0.0",
+  "evals": [
+    {
+      "id": 1,
+      "name": "generic-pi5-readiness",
+      "prompt": "Create a comprehensive pre-installation system checker script for my Raspberry Pi 5 running Debian Bookworm. I want to check everything before installing any server application.",
+      "expected_output": "A bash script with all 15+ sections, Pi 5 specific checks, auto-tune section, uses inc() helper, no ((VAR++)), no set -e, passes bash -n",
+      "assertions": [
+        "Script passes bash -n with no errors",
+        "Contains inc() function definition",
+        "No raw ((VAR++)) patterns outside of comments",
+        "Has at least 14 numbered sections",
+        "Section 13 contains Pi-specific checks (vcgencmd, config.txt, cmdline.txt)",
+        "Section 15 auto-tune section is present",
+        "Final summary shows PASS/WARN/FAIL/SKIP counts",
+        "Every warn/fail message contains ' — ' with a fix command"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "docker-compose-stack",
+      "prompt": "I'm about to install a Docker Compose application stack on my Pi 4 (Bookworm). It needs ports 80, 443, 3000, 5432, 6379. Create a pre-installation checker.",
+      "expected_output": "Script checking Docker prerequisites, those specific ports, cgroups v2, overlay2 storage driver, sufficient disk space",
+      "assertions": [
+        "Checks Docker version >= 24.0",
+        "Checks for ports 80, 443, 3000, 5432, 6379",
+        "Checks cgroups v2",
+        "Checks overlay2 storage driver",
+        "Includes Pi 4 compatible checks (no Pi 5 only features like PCIe Gen 3)",
+        "Script passes bash -n"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "k3s-kubernetes",
+      "prompt": "Check my Pi 5 cluster node before installing k3s. It's running Bookworm, I'm the user 'pi' with sudo access.",
+      "expected_output": "Script with k3s-specific checks: kubectl, helm, required ports 6443/10250/10257/10259, conflict service detection (microk8s, rke2), cgroup params",
+      "assertions": [
+        "Checks for conflicting services: microk8s, rke2-server, rke2-agent",
+        "Checks ports 6443, 10250, 10257, 10259",
+        "Checks cgroup_enable=memory in cmdline.txt",
+        "Checks for kubectl",
+        "Checks inotify limits",
+        "Script passes bash -n"
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "home-assistant",
+      "prompt": "I want to install Home Assistant Supervised on my Pi 4 running Bookworm. What do I need to check first?",
+      "expected_output": "Script checking HA Supervised prerequisites: systemd-resolved, AppArmor, Docker, network manager, specific OS requirements",
+      "assertions": [
+        "Checks systemd-resolved is active",
+        "Checks AppArmor status",
+        "Checks Docker",
+        "Checks NetworkManager",
+        "Checks OS is Debian (not Ubuntu)",
+        "Script passes bash -n"
+      ],
+      "files": []
+    }
+  ]
+}
