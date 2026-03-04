@@ -1,0 +1,51 @@
+{
+  "skill_name": "bash-quality-checker",
+  "version": "1.0.0",
+  "evals": [
+    {
+      "id": 1,
+      "name": "script-with-known-bugs",
+      "prompt": "Review this bash script for my Pi:\n\n```bash\n#!/bin/bash\nset -euo pipefail\nPASS=0\nWARN=0\ncheck_docker() {\n  STATE=$(systemctl is-system-running 2>/dev/null | head -1 || echo \"unknown\")\n  if [[ \"$STATE\" == \"running\" ]]; then\n    ((PASS++))\n    echo \"Docker OK\"\n  fi\n}\nVER=$(docker --version | grep -oP '\\d+\\.\\d+\\.\\d+' || echo \"0\")\nif [[ \"$VER\" > \"24.0\" ]]; then\n  echo \"new enough\"\nfi\ncheck_docker\n```",
+      "expected_output": "Report identifying: set -e danger, ((PASS++)) bug, pipeline+fallback concatenation bug, string version comparison bug",
+      "assertions": [
+        "Identifies ((PASS++)) as a bug when PASS=0",
+        "Identifies the pipeline+fallback pattern as producing concatenated output",
+        "Identifies set -e as problematic",
+        "Identifies string version comparison as incorrect",
+        "Provides corrected code for each issue",
+        "Report uses the structured format with Summary table"
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "portability-audit",
+      "prompt": "Check this script for portability issues on Raspberry Pi Bookworm:\n\n```bash\n#!/bin/sh\nKB=$(echo 'scale=2; 1024*1024' | bc)\nNETSTAT=$(netstat -tlnp 2>/dev/null)\nCONFIG=/boot/config.txt\nVER=$(python --version 2>&1)\n```",
+      "expected_output": "Report identifying: /bin/sh shebang with potential bash features, bc dependency, netstat deprecated in favor of ss, hardcoded /boot/config.txt path (should check both), python vs python3",
+      "assertions": [
+        "Flags /bin/sh shebang",
+        "Flags bc as potentially missing",
+        "Flags netstat as deprecated, recommends ss",
+        "Flags hardcoded /boot/config.txt (missing /boot/firmware/config.txt)",
+        "Flags python vs python3",
+        "Provides fixes for each issue"
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "good-script-review",
+      "prompt": "Review this script — I want to know what it does well and what could be improved:\n\n```bash\n#!/usr/bin/env bash\nset -uo pipefail\nPASS=0; FAIL=0\ninc() { local v=\"${!1}\"; eval \"$1=$(( v + 1 ))\"; return 0; }\nhas_cmd() { command -v \"$1\" >/dev/null 2>&1; }\nif has_cmd docker; then\n  VER_RAW=$(docker --version 2>/dev/null || true)\n  VER=$(printf \"%s\" \"$VER_RAW\" | grep -oP '\\d+\\.\\d+\\.\\d+' | head -1)\n  VER=\"${VER:-0.0.0}\"\n  inc PASS\n  echo \"Docker: $VER\"\nfi\n```",
+      "expected_output": "Positive review noting good patterns (inc helper, has_cmd, two-step capture), with minor suggestions (version comparison helper, output formatting)",
+      "assertions": [
+        "Acknowledges inc() as a correct pattern",
+        "Acknowledges has_cmd as a correct pattern",
+        "Acknowledges two-step VER_RAW/VER capture as correct",
+        "Suggests adding version_gte helper for version comparison",
+        "Does not flag false positives on the correct patterns",
+        "Overall rating is PASS or WARN (not FAIL)"
+      ],
+      "files": []
+    }
+  ]
+}
